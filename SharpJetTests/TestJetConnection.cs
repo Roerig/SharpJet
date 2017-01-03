@@ -30,6 +30,8 @@
 
 namespace Hbm.Devices.Jet
 {
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
 
@@ -45,13 +47,14 @@ namespace Hbm.Devices.Jet
 
         public List<string> messages;
 
-        public TestJetConnection(Behaviour behaviour)
+        public TestJetConnection(Behaviour behaviour = Behaviour.ConnectionSuccess)
         {
             this.behaviour = behaviour;
             this.messages = new List<string>();
         }
 
         public event EventHandler<StringEventArgs> HandleIncomingMessage;
+        public static String successPath = "success";
 
         public void Connect(Action<bool> completed, double timeoutMs)
         {
@@ -68,9 +71,27 @@ namespace Hbm.Devices.Jet
             }
         }
 
-        public void SendMessage(string json)
+
+        public void SendMessage(string message)
         {
-            messages.Add(json);
+            messages.Add(message);
+
+            JToken json = JToken.Parse(message);
+            JToken parameters = json["params"];
+            JToken path = parameters["path"];
+
+            if (path.ToString().Equals(successPath)) {
+                EmitSuccessResponse(json);
+            }
+        }
+
+        private void EmitSuccessResponse(JToken json) {
+            JObject response = new JObject();
+            response["jsonrpc"] = "2.0";
+            response["id"] = json["id"];
+            response["result"] = true;
+
+            HandleIncomingMessage(this, new StringEventArgs(JsonConvert.SerializeObject(response)));
         }
 
         public void Disconnect()

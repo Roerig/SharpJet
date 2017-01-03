@@ -33,44 +33,6 @@ namespace Hbm.Devices.Jet
     using NUnit.Framework;
     using Newtonsoft.Json.Linq;
     using System;
-    using Newtonsoft.Json;
-
-    public class TestSetCallbackConnection : IJetConnection
-    {
-        public event EventHandler<StringEventArgs> HandleIncomingMessage;
-        public static String successPath = "success";
-
-        public void Connect(Action<bool> completed, double timeoutMs)
-        {
-            completed(true);
-        }
-
-        public void SendMessage(string message)
-        {
-            JToken json = JToken.Parse(message);
-            JToken parameters = json["params"];
-            JToken path = parameters["path"];
-
-            if (path.ToString().Equals(successPath))
-            {
-                emitSuccessResponse(json);
-            }
-        }
-
-        private void emitSuccessResponse(JToken json)
-        {
-            JObject response = new JObject();
-            response["jsonrpc"] = "2.0";
-            response["id"] = json["id"];
-            response["result"] = true;
-
-            HandleIncomingMessage(this, new StringEventArgs(JsonConvert.SerializeObject(response)));
-        }
-
-        public void Disconnect()
-        {
-        }
-    }
 
     [TestFixture]
     public class SetCallbacksTests
@@ -82,15 +44,15 @@ namespace Hbm.Devices.Jet
         [Test]
         public void SetTestOnOwnState()
         {
-            peer = new JetPeer(new TestSetCallbackConnection());
+            peer = new JetPeer(new TestJetConnection());
             JValue stateValue = new JValue(12);
-            JObject message = peer.AddState(TestSetCallbackConnection.successPath, stateValue, this.OnSet, this.AddResponseCallback, 3000);
+            JObject message = peer.AddState(TestJetConnection.successPath, stateValue, this.OnSet, this.AddResponseCallback, 3000);
 
             Assert.Throws<ArgumentException>(
                 delegate
                 {
                     JValue newValue = new JValue(13);
-                    peer.Set(TestSetCallbackConnection.successPath, newValue, this.AddResponseCallback, 3000);
+                    peer.Set(TestJetConnection.successPath, newValue, this.AddResponseCallback, 3000);
                 },
                 "no exception thrown when setting own state");
         }

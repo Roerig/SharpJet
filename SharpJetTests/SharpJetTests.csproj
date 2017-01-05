@@ -48,11 +48,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChangeTest.cs" />
     <Compile Include="ConnectTests.cs" />
     <Compile Include="SetCallbacksTests.cs" />
     <Compile Include="SetTests.cs" />
     <Compile Include="TestJetConnection.cs" />
-    <Compile Include="TestSetConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

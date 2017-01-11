@@ -56,7 +56,7 @@ namespace Hbm.Devices.Jet
         public void SetTestSuccess()
         {
             JValue stateValue = new JValue(12);
-            JObject message = peer.Set(TestJetConnection.successPath, stateValue, this.SetResponseCallback, 3000);
+            JObject message = peer.Set(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, this.SetResponseCallback, 3000);
             Assert.True(this.setCallbackCalled, "SetCallback was not called");
             Assert.True(this.setSucceeded, "SetCallback was completed successfully");
         }
@@ -65,10 +65,10 @@ namespace Hbm.Devices.Jet
         public void SetTestOnOwnState()
         {
             JValue stateValue = new JValue(12);
-            JObject message = peer.AddState(TestJetConnection.successPath, stateValue, this.OnSet, this.AddResponseCallback, 3000);
+            JObject message = peer.AddState(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, this.OnSet, this.AddResponseCallback, 3000);
             Assert.Throws<ArgumentException>(delegate
             {
-                message = peer.Set(TestJetConnection.successPath, stateValue, this.SetResponseCallback, 3000);
+                message = peer.Set(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, this.SetResponseCallback, 3000);
             }, "Setting a state that is owned by the peer didn't failed");
         }
 
@@ -102,6 +102,7 @@ namespace Hbm.Devices.Jet
 
         private JToken OnSet(string path, JToken newValue)
         {
+            Console.WriteLine("Change-Event is called \n path: " + path);
             return null;
         }
 

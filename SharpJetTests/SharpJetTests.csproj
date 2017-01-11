@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="ChangeTest.cs" />
     <Compile Include="ConnectTests.cs" />
+    <Compile Include="FetchTest.cs" />
     <Compile Include="SetCallbacksTests.cs" />
     <Compile Include="SetTests.cs" />
     <Compile Include="TestJetConnection.cs" />

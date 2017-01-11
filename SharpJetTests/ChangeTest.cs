@@ -9,7 +9,6 @@ namespace SharpJetTests
     [TestFixture]
     class ChangeTest
     {
-        private bool changeCallbackCalled;
         private bool responseSuccess;
         private bool responseCallbackCalled;
         private JetPeer peer;
@@ -22,29 +21,29 @@ namespace SharpJetTests
         }
 
         [Test]
-        public void ChangeTestSuccess() {
+        public void ChangeSuccessTest() {
             JValue stateValue = new JValue(42);
 
-            JObject addMessage = peer.AddState(TestJetConnection.successPath, stateValue, OnChange, ResponseCallback, 3000);
-            JObject changeMessage = peer.Change(TestJetConnection.successPath, stateValue, ResponseCallback, 3000);
+            JObject addMessage = peer.AddState(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, OnChangeState, ResponseCallback, 3000);
+            JObject changeMessage = peer.Change(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, ResponseCallback, 3000);
 
             Assert.True(this.responseCallbackCalled, "ChangeCallback was not called");
             Assert.True(this.responseSuccess, "Changecallback was completed successfully");
         }
 
         [Test]
-        public void ChangeNotOnOwnState() {
+        public void ChangeNotOnOwnStateTest() {
             Assert.Throws<ArgumentException>(delegate {
                 JValue stateValue = new JValue(42);
-                JObject changeMessage = peer.Change(TestJetConnection.successPath, stateValue, ResponseCallback, 3000);
-            }, "Change a state wich not the state of himself");
-
+                JObject changeMessage = peer.Change(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, ResponseCallback, 3000);
+            }, "Change a state that is owned by the peer");
         }
 
         private void OnConnect(bool completed) { }
 
-        private JToken OnChange(string path, JToken newValue) {
-            
+        private JToken OnChangeState(string path, JToken newValue) {
+
+            Console.WriteLine("Change-Event is called \n path: " + path);
             return null;
         }
 

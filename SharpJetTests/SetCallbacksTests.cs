@@ -46,13 +46,13 @@ namespace Hbm.Devices.Jet
         {
             peer = new JetPeer(new TestJetConnection());
             JValue stateValue = new JValue(12);
-            JObject message = peer.AddState(TestJetConnection.successPath, stateValue, this.OnSet, this.AddResponseCallback, 3000);
+            JObject message = peer.AddState(TestJetConnection.DEFAULT_SUCCESS_PATH, stateValue, this.OnSet, this.AddResponseCallback, 3000);
 
             Assert.Throws<ArgumentException>(
                 delegate
                 {
                     JValue newValue = new JValue(13);
-                    peer.Set(TestJetConnection.successPath, newValue, this.AddResponseCallback, 3000);
+                    peer.Set(TestJetConnection.DEFAULT_SUCCESS_PATH, newValue, this.AddResponseCallback, 3000);
                 },
                 "no exception thrown when setting own state");
         }

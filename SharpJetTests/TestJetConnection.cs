@@ -43,6 +43,7 @@ namespace Hbm.Devices.Jet
 
     public class TestJetConnection : IJetConnection
     {
+        public const string DEFAULT_SUCCESS_PATH = "success";
         private Behaviour behaviour;
 
         public List<string> messages;
@@ -54,7 +55,6 @@ namespace Hbm.Devices.Jet
         }
 
         public event EventHandler<StringEventArgs> HandleIncomingMessage;
-        public static String successPath = "success";
 
         public void Connect(Action<bool> completed, double timeoutMs)
         {
@@ -75,21 +75,36 @@ namespace Hbm.Devices.Jet
         public void SendMessage(string message)
         {
             messages.Add(message);
-
             JToken json = JToken.Parse(message);
+
+            JToken method = json["method"];
+    
             JToken parameters = json["params"];
             JToken path = parameters["path"];
 
-            if (path.ToString().Equals(successPath)) {
-                EmitSuccessResponse(json);
+            if (path.ToString().Contains(DEFAULT_SUCCESS_PATH)) {
+                EmitCallbackMessage(json);
             }
         }
 
-        private void EmitSuccessResponse(JToken json) {
+        private void EmitCallbackMessage(JToken json) {
             JObject response = new JObject();
             response["jsonrpc"] = "2.0";
             response["id"] = json["id"];
+      
             response["result"] = true;
+
+            //switch (json["method"].ToString()) {
+            //    case "fetch":
+            //        response["fetchOnly"] = true;
+            //        response["event"] = "change";
+            //        response["value"] = 4242;
+            //        break;
+
+            //    default: // response
+            //        response["result"] = true;
+            //        break;
+            //}
 
             HandleIncomingMessage(this, new StringEventArgs(JsonConvert.SerializeObject(response)));
         }
